@@ -1,516 +1,403 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Baby Tracker</title>
-<style>
-  :root{
-    --bg:#f5f6f7;
-    --card:#ffffff;
-    --muted:#7b7f86;
-    --text:#0b0b0c;
-    --accent:#007aff;
-    --accent-2:#34c759;
-    --danger:#ff3b30;
-    --radius:14px;
-    --shadow: 0 10px 30px rgba(15,15,15,0.06);
-  }
-  *{box-sizing:border-box}
-  body{
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
-    background: linear-gradient(180deg, #fbfcfd, #f2f4f6);
-    margin:0; color:var(--text); -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:1000px; margin:22px auto; padding:18px;}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  h1{font-size:20px;margin:0}
-  .sub{color:var(--muted);font-size:13px}
-  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
-  @media (max-width:880px){ .grid{grid-template-columns:1fr} }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baby Tracker</title>
+  <meta name="theme-color" content="#0b0b0c" />
+  <style>
+    :root{
+      --bg:#0b0b0c;          /* тёмный фон, современно */
+      --card:#121214;        /* карточки */
+      --muted:#8b8d93;       /* вторичный текст */
+      --text:#f4f6f8;        /* основной текст */
+      --brand:#2aa9ff;       /* акцент */
+      --brand-2:#7ae27a;     /* акцент 2 */
+      --danger:#ff5c5c;      /* опасные действия */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text); background:radial-gradient(1000px 600px at 80% -10%, #0d1a22, transparent), var(--bg);
+      letter-spacing:.2px;
+    }
+    .wrap{max-width:980px; margin:0 auto; padding:28px 16px 60px}
+    header{display:flex; gap:14px; align-items:center; justify-content:space-between; margin-bottom:18px}
+    .app-title{font-size:20px; font-weight:700; letter-spacing:.3px}
+    .sub{color:var(--muted); font-size:13px}
 
-  .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; border:1px solid rgba(15,15,15,0.04)}
-  .section-title{font-weight:700;font-size:14px;margin:0 0 10px}
-  .controls{display:flex;flex-wrap:wrap;gap:10px}
-  button{
-    border:0;padding:12px 14px;border-radius:12px;font-weight:600;cursor:pointer;
-    background:#f2f4f7;color:var(--text);border:1px solid rgba(15,15,15,0.04);
-    display:inline-flex;align-items:center;gap:8px;
-  }
-  button:active{transform:translateY(1px)}
-  .btn-primary{background:linear-gradient(180deg,#0b84ff,#007aff);color:#fff}
-  .btn-green{background:linear-gradient(180deg,#39d26a,#17c04a);color:#fff}
-  .btn-danger{background:linear-gradient(180deg,#ff6b6b,#ff3b30);color:#fff}
-  .btn-ghost{background:transparent;border:1px solid rgba(15,15,15,0.03)}
-  .status-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-  .badge{padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.04);font-size:13px}
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-  .kpi{background:rgba(10,10,10,0.02);padding:10px;border-radius:10px;font-size:13px}
-  .kpi .val{font-weight:700;font-size:16px;margin-top:6px}
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    @media (max-width:880px){ .grid{grid-template-columns:1fr} }
 
-  /* Timeline */
-  .timeline{margin-top:16px}
-  .day{margin-top:12px}
-  .day h3{font-size:12px;color:var(--muted);text-transform:uppercase;margin:0 0 8px}
-  .item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfbfc);border:1px solid rgba(15,15,15,0.03);margin-bottom:8px}
-  .left{display:flex;gap:12px;align-items:center}
-  .ico{width:36px;height:36px;border-radius:10px;background:rgba(0,0,0,0.03);display:flex;align-items:center;justify-content:center;font-size:18px}
-  .meta{display:flex;flex-direction:column}
-  .meta .title{font-weight:700}
-  .meta .sub{color:var(--muted);font-size:13px;margin-top:4px}
-  .right{display:flex;gap:8px;align-items:center}
-  .tiny{font-size:12px;color:var(--muted)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+    .card h2{font-size:15px; font-weight:700; margin:0 0 10px}
 
-  .trash{background:transparent;border:0;color:var(--danger);padding:6px 8px;border-radius:8px;cursor:pointer}
-  .active-dot{width:10px;height:10px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 6px rgba(52,199,89,0.12);margin-right:8px}
+    .status{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border-radius:14px; background:#0f0f12; border:1px solid rgba(255,255,255,.05)}
+    .status .dot{width:10px; height:10px; border-radius:50%; margin-right:8px}
+    .status .on{background:var(--brand-2); box-shadow:0 0 0 3px rgba(122,226,122,.15)}
+    .status .off{background:#555; box-shadow:0 0 0 3px rgba(255,255,255,.08)}
 
-  /* toast */
-  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity .16s}
-</style>
+    .btns{display:flex; flex-wrap:wrap; gap:10px}
+    button{
+      appearance:none; border:0; cursor:pointer; padding:14px 16px; border-radius:14px;
+      background:#15161a; color:var(--text); font-weight:650; letter-spacing:.2px; transition:transform .06s ease, filter .2s ease, background .2s ease;
+      border:1px solid rgba(255,255,255,.06); box-shadow: 0 6px 14px rgba(0,0,0,.35);
+    }
+    button:hover{filter:brightness(1.08)}
+    button:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(180deg, #1a1f24, #13161a); border-color: rgba(42,169,255,.35)}
+    .btn-accent{background:linear-gradient(180deg, #162016, #101610); border-color: rgba(122,226,122,.4)}
+    .btn-danger{background:linear-gradient(180deg, #241616, #1a1111); border-color: rgba(255,92,92,.35)}
+
+    .kpi{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:12px}
+    .kpi .box{padding:14px; background:#0f1013; border-radius:12px; border:1px solid rgba(255,255,255,.06)}
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .val{font-size:20px; font-weight:700; margin-top:4px}
+
+    .timeline{margin-top:10px}
+    .tl-day{margin-top:8px}
+    .tl-day h3{font-size:13px; color:var(--muted); font-weight:700; letter-spacing:.4px; text-transform:uppercase; margin:16px 4px 6px}
+    .item{display:flex; align-items:center; gap:12px; padding:12px; background:#0f1013; border:1px solid rgba(255,255,255,.06); border-radius:12px; margin:6px 0}
+    .i-ico{font-size:18px; width:28px; text-align:center}
+    .i-main{flex:1}
+    .i-title{font-weight:650}
+    .i-sub{color:var(--muted); font-size:13px}
+
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .row.stretch{justify-content:space-between}
+
+    .tiny{font-size:12px; color:var(--muted)}
+    .ghost{opacity:.85}
+
+    .footer{margin-top:16px; display:flex; justify-content:space-between; align-items:center}
+    .link{color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25)}
+
+    /* Toggle-like buttons */
+    .btn-start{background:linear-gradient(180deg, #112232, #0c1720); border-color: rgba(42,169,255,.45)}
+    .btn-stop{background:linear-gradient(180deg, #2b1212, #180d0d); border-color: rgba(255,92,92,.45)}
+    .btn-feed{background:linear-gradient(180deg, #142023, #0f1618); border-color:rgba(42,169,255,.35)}
+    .btn-diaper{background:linear-gradient(180deg, #121f14, #0d160e); border-color:rgba(122,226,122,.35)}
+
+    .badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.12); background:#101114}
+  </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div>
-        <h1>Baby Tracker</h1>
-        <!-- <div class="sub">Сон · Прогулка · Подгузник</div> -->
+        <div class="app-title">Baby Tracker</div>
+        <!-- <div class="sub">Сон · Еда · Подгузник — минимализм, скорость, чёткие действия</div> -->
       </div>
-      <!-- <div class="tiny">Данные в смартфоне*</div> -->
+      <!-- <div class="tiny">Данные хранятся локально (LocalStorage)</div> -->
     </header>
 
     <div class="grid">
-      <!-- Left column: Sleep + Feeding session -->
+      <!-- Левая колонка: управление сном -->
       <section class="card" aria-labelledby="sleep-title">
-        <h2 id="sleep-title" class="section-title">Сон</h2>
+        <h2 id="sleep-title">Сон</h2>
 
-        <div class="controls">
-          <button id="sleepStart" class="btn-primary">Старт сна</button>
-          <button id="sleepStop" class="btn-ghost">Стоп сна</button>
-          <div style="flex:1"></div>
-          <div id="sleepIndicator" class="badge">Сейчас: не спит</div>
-        </div>
-
-        <div class="status-row">
-          <div class="kpis" style="flex:1">
-            <div class="kpi"><div class="tiny">Сегодня</div><div class="val" id="sleepToday">0:00</div></div>
-            <div class="kpi"><div class="tiny">Последняя сессия</div><div class="val" id="sleepLast">—</div></div>
-            <div class="kpi"><div class="tiny">Текущая</div><div class="val" id="sleepCurrent">—</div></div>
+        <div class="status" id="sleepStatus">
+          <div class="row">
+            <div class="dot off" id="sleepDot"></div>
+            <div>
+              <div class="i-title" id="sleepState">Сейчас не спит</div>
+              <div class="i-sub" id="sleepTimer">—</div>
+            </div>
           </div>
+          <div class="badge" id="lastSleepBadge">Последний сон: —</div>
         </div>
 
-        <hr style="margin:14px 0;border:none;border-top:1px solid rgba(0,0,0,0.04)">
-
-        <h3 class="section-title">Прогулка</h3>
-        <div class="controls">
-          <button id="feedSessionStart" class="btn-primary">Старт</button>
-          <button id="feedSessionStop" class="btn-ghost">Финиш</button>
-          <div style="flex:1"></div>
-          <div id="feedSessionIndicator" class="badge">Сейчас: не в прогулки</div>
+        <div class="btns" style="margin-top:12px">
+          <button class="btn-start" id="btnStart">Старт сна</button>
+          <button class="btn-stop" id="btnStop">Стоп сна</button>
         </div>
 
-        <div style="margin-top:10px" class="kpis">
-          <div class="kpi"><div class="tiny">Сессий сегодня</div><div class="val" id="feedSessCount">0</div></div>
-          <div class="kpi"><div class="tiny">Последняя сессия</div><div class="val" id="feedSessLast">—</div></div>
-          <div class="kpi"><div class="tiny">Текущая длительность</div><div class="val" id="feedSessCurrent">—</div></div>
+        <div class="kpi">
+          <div class="box"><div class="label">Сегодня спал(а)</div><div class="val" id="kpiToday">0:00</div></div>
+          <div class="box"><div class="label">Последняя сессия</div><div class="val" id="kpiLast">—</div></div>
+          <div class="box"><div class="label">Текущая сессия</div><div class="val" id="kpiCurrent">—</div></div>
         </div>
       </section>
 
-      <!-- Right column: quick events -->
+      <!-- Правая колонка: быстрые события -->
       <section class="card" aria-labelledby="quick-title">
-        <h2 id="quick-title" class="section-title">Важные отметки</h2>
-        <div class="controls" style="margin-bottom:12px">
-          <button id="markFeed" class="btn-primary">🍼 Кормление + </button>
-          <button id="markDiaper" class="btn-green">👶🏻 Подгузник + </button>
-          <button id="clearAll" class="btn-danger">Очистить всё</button>
+        <h2 id="quick-title">Быстрые отметки</h2>
+        <div class="btns">
+          <button class="btn-feed" id="btnFeed">+ Еда</button>
+          <button class="btn-diaper" id="btnDiaper">+ Подгузник</button>
         </div>
 
-        <div class="kpis">
-          <div class="kpi"><div class="tiny">С последнего кормления</div><div class="val" id="sinceFeed">—</div></div>
-          <div class="kpi"><div class="tiny">С последней смены</div><div class="val" id="sinceDiaper">—</div></div>
-          <div class="kpi"><div class="tiny">Сейчас</div><div class="val" id="nowTime">—</div></div>
+        <div class="kpi">
+          <div class="box"><div class="label">С последнего кормления</div><div class="val" id="sinceFeed">—</div></div>
+          <div class="box"><div class="label">С последней смены</div><div class="val" id="sinceDiaper">—</div></div>
+          <div class="box"><div class="label">Сейчас</div><div class="val" id="now">—</div></div>
+        </div>
+
+        <div class="footer">
+          <a class="link" href="#" id="clearAll">Сбросить все данные</a>
+          <span class="tiny ghost">v1.0 · оффлайн</span>
         </div>
       </section>
     </div>
 
-    <!-- Timeline -->
-    <section class="card timeline" aria-labelledby="tl-title" style="margin-top:16px">
-      <h2 id="tl-title" class="section-title">Лента событий</h2>
+    <!-- Лента событий -->
+    <section class="card timeline" aria-labelledby="tl-title">
+      <h2 id="tl-title">Лента</h2>
       <div id="timeline"></div>
     </section>
   </div>
 
-  <div id="toast"></div>
+  <script>
+    // ===== УТИЛИТЫ ВРЕМЕНИ =====
+    const pad = n => String(n).padStart(2,'0');
+    const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const fmtDateKey = d => d.toISOString().slice(0,10);
+    function fmtDateHuman(d){
+      const todayKey = fmtDateKey(new Date());
+      const key = fmtDateKey(d);
+      if(key===todayKey) return 'Сегодня';
+      const y = new Date(); y.setDate(y.getDate()-1);
+      if(key===fmtDateKey(y)) return 'Вчера';
+      return d.toLocaleDateString('ru-RU', {weekday:'long', day:'2-digit', month:'long'});
+    }
+    function fmtDuration(ms){
+      if(ms == null || isNaN(ms)) return '—';
+      const s = Math.max(0, Math.floor(ms/1000));
+      const h = Math.floor(s/3600);
+      const m = Math.floor((s%3600)/60);
+      const sec = s%60;
+      return h>0 ? `${h}:${pad(m)}` : `${m}:${pad(sec)}`;
+    }
 
-<script>
-(() => {
-  // ----- state shape -----
-  // state.items: array of events/sessions ordered by time desc
-  // item = {
-  //   id: string,
-  //   type: 'sleep'|'feed'|'diaper'|'feed_session',
-  //   time?: number,           // for instant events
-  //   start?: number, end?: number // for sessions
-  // }
-  const KEY = 'baby-tracker-v3';
-  let state = { items: [] };
+    // ===== ХРАНИЛИЩЕ =====
+    const KEY = 'babyLogV1';
+    const state = {
+      sleepingFrom: null,        // timestamp | null
+      sessions: [],              // {start:number, end:number}
+      events: []                 // {type:'feed'|'diaper', time:number}
+    };
+    function load(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(raw){ Object.assign(state, JSON.parse(raw)); }
+      }catch(e){ console.warn('Load error', e) }
+    }
+    function save(){
+      try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+      catch(e){ console.warn('Save error', e) }
+    }
 
-  // running sessions
-  let sleepRunning = null;       // timestamp start or null
-  let feedSessionRunning = null; // timestamp start or null
-  let tickTimer = null;
-
-  // DOM
-  const el = s => document.querySelector(s);
-  const $sleepStart = el('#sleepStart'), $sleepStop = el('#sleepStop'), $sleepIndicator = el('#sleepIndicator');
-  const $sleepToday = el('#sleepToday'), $sleepLast = el('#sleepLast'), $sleepCurrent = el('#sleepCurrent');
-  const $feedSessionStart = el('#feedSessionStart'), $feedSessionStop = el('#feedSessionStop'), $feedSessIndicator = el('#feedSessionIndicator');
-  const $feedSessCount = el('#feedSessCount'), $feedSessLast = el('#feedSessLast'), $feedSessCurrent = el('#feedSessCurrent');
-  const $markFeed = el('#markFeed'), $markDiaper = el('#markDiaper'), $clearAll = el('#clearAll');
-  const $sinceFeed = el('#sinceFeed'), $sinceDiaper = el('#sinceDiaper'), $nowTime = el('#nowTime');
-  const $timeline = el('#timeline');
-  const $toast = el('#toast');
-
-  // helpers
-  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-  const fmtTime = t => {
-    const d = new Date(t);
-    return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-  };
-  const fmtDateKey = t => new Date(t).toISOString().slice(0,10);
-  const fmtDateHuman = t => {
-    const d = new Date(t);
-    const key = fmtDateKey(t);
-    const today = fmtDateKey(Date.now());
-    const yesterday = fmtDateKey(Date.now() - 24*3600*1000);
-    if (key === today) return 'Сегодня';
-    if (key === yesterday) return 'Вчера';
-    return d.toLocaleDateString('ru-RU',{weekday:'short', day:'2-digit', month:'short'});
-  };
-  function fmtDuration(ms){
-    if(ms == null || isNaN(ms)) return '—';
-    const s = Math.floor(ms/1000);
-    const h = Math.floor(s/3600);
-    const m = Math.floor((s % 3600)/60);
-    const sec = s % 60;
-    if(h>0) return `${h}ч ${m}м`;
-    return `${m}м ${sec}s`;
-  }
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(KEY);
-      if(raw) state = JSON.parse(raw);
-      else state = { items: [] };
-    }catch(e){ state = { items: [] }; }
-  }
-  function save(){
-    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ console.warn('Save failed',e); }
-  }
-
-  // add instant event
-  function addInstant(type){
-    const now = Date.now();
-    state.items.unshift({ id: uid(), type, time: now });
-    save(); render();
-    toast('Отметка сохранена');
-  }
-
-  // add session record
-  function pushSession(type, start, end){
-    state.items.unshift({ id: uid(), type, start, end });
-    save(); render();
-  }
-
-  // delete
-  function deleteItem(id){
-    if(!confirm('Удалить эту запись?')) return;
-    state.items = state.items.filter(i=>i.id!==id);
-    save(); render();
-  }
-
-  // start/stop for sleep
-  function startSleep(){
-    if(sleepRunning){ toast('Сон уже идёт'); return; }
-    sleepRunning = Date.now();
-    updateActiveUI();
-    toast('Сон начат');
-  }
-  function stopSleep(){
-    if(!sleepRunning){ toast('Сон не запущен'); return; }
-    const start = sleepRunning; const end = Date.now();
-    const dur = end - start;
-    // защита: не сохраняем меньше 5 секунд
-    if(dur < 5000){ sleepRunning = null; updateActiveUI(); toast('Сессия слишком короткая — не сохранена'); return; }
-    pushSession('sleep', start, end);
-    sleepRunning = null;
-    updateActiveUI();
-    toast('Сон сохранён');
-  }
-
-  // feeding session start/stop
-  function startFeedSession(){
-    if(feedSessionRunning){ toast('Прогулка уже идёт'); return; }
-    feedSessionRunning = Date.now();
-    updateActiveUI();
-    toast('Сессия прогулки начата');
-  }
-  function stopFeedSession(){
-    if(!feedSessionRunning){ toast('Сессия прогулки не запущена'); return; }
-    const start = feedSessionRunning; const end = Date.now();
-    const dur = end - start;
-    if(dur < 3000){ feedSessionRunning = null; updateActiveUI(); toast('Короткая сессия — не сохранена'); return; }
-    pushSession('feed_session', start, end);
-    feedSessionRunning = null;
-    updateActiveUI();
-    toast('Сессия прогулки сохранена');
-  }
-
-  // metrics
-  function sumTodaySleep(){
-    const todayKey = fmtDateKey(Date.now());
-    let total = 0;
-    for(const it of state.items){
-      if(it.type==='sleep' && it.start && it.end){
-        if(fmtDateKey(it.start) === todayKey) total += (it.end - it.start);
+    // ===== ЛОГИКА СНА =====
+    function startSleep(){
+      if(state.sleepingFrom){ toast('Сон уже идёт'); return; }
+      state.sleepingFrom = Date.now();
+      save();
+      render();
+    }
+    function stopSleep(){
+      if(!state.sleepingFrom){ toast('Сон не запущен'); return; }
+      const now = Date.now();
+      const start = state.sleepingFrom;
+      if(now - start < 30*1000){ // анти-ошибка: <30 сек не пишем
+        state.sleepingFrom = null; save(); render();
+        toast('Короткая сессия не сохранена (<30с)');
+        return;
       }
+      state.sessions.unshift({start, end: now});
+      state.sleepingFrom = null;
+      save();
+      render();
     }
-    if(sleepRunning && fmtDateKey(sleepRunning) === todayKey) total += (Date.now() - sleepRunning);
-    return total;
-  }
-  function lastSleep(){
-    for(const it of state.items){
-      if(it.type==='sleep' && it.start && it.end) return it;
+
+    // ===== СОБЫТИЯ =====
+    function addEvent(type){
+      const time = Date.now();
+      state.events.unshift({type, time});
+      save();
+      render();
     }
-    return null;
-  }
-  function lastFeedSession(){
-    for(const it of state.items){
-      if(it.type==='feed_session' && it.start && it.end) return it;
-    }
-    return null;
-  }
-  function countTodayFeedSessions(){
-    const todayKey = fmtDateKey(Date.now());
-    let c = 0;
-    for(const it of state.items){
-      if(it.type==='feed_session' && it.start && it.end){
-        if(fmtDateKey(it.start) === todayKey) c++;
+
+    // ===== UI =====
+    const el = sel => document.querySelector(sel);
+    const $ = {
+      sleepDot: el('#sleepDot'),
+      sleepState: el('#sleepState'),
+      sleepTimer: el('#sleepTimer'),
+      lastSleepBadge: el('#lastSleepBadge'),
+      kpiToday: el('#kpiToday'),
+      kpiLast: el('#kpiLast'),
+      kpiCurrent: el('#kpiCurrent'),
+      sinceFeed: el('#sinceFeed'),
+      sinceDiaper: el('#sinceDiaper'),
+      now: el('#now'),
+      timeline: el('#timeline'),
+      btnStart: el('#btnStart'),
+      btnStop: el('#btnStop'),
+      btnFeed: el('#btnFeed'),
+      btnDiaper: el('#btnDiaper'),
+      clearAll: el('#clearAll'),
+    };
+
+    function sumTodaySessions(){
+      const todayKey = fmtDateKey(new Date());
+      let total = 0;
+      for(const s of state.sessions){
+        const d = new Date(s.start);
+        if(fmtDateKey(d) === todayKey){ total += (s.end - s.start); }
       }
+      // если сейчас идёт сон — добавить текущий прогресс
+      if(state.sleepingFrom){
+        const d = new Date(state.sleepingFrom);
+        if(fmtDateKey(d) === todayKey){ total += (Date.now() - state.sleepingFrom); }
+      }
+      return total;
     }
-    if(feedSessionRunning && fmtDateKey(feedSessionRunning) === todayKey) c++;
-    return c;
-  }
 
-  function timeSinceLast(type){
-    // for feed/diaper instantaneous events return since last time
-    for(const it of state.items){
-      if(it.type === type && it.time) return Date.now() - it.time;
+    function lastSession(){ return state.sessions[0] || null; }
+
+    function sinceLast(type){
+      const list = type === 'sleep'
+        ? [{time: state.sleepingFrom || lastSession()?.end || null}]
+        : state.events.filter(e=>e.type===type);
+      const t = list && list[0] ? list[0].time : null;
+      return t ? Date.now() - t : null;
     }
-    return null;
-  }
 
-  // render timeline grouped by day
-  function groupByDay(items){
-    const map = new Map();
-    for(const it of items){
-      const t = it.time ?? it.end ?? it.start;
-      const key = fmtDateKey(t);
-      if(!map.has(key)) map.set(key, []);
-      map.get(key).push(it);
+    function renderStatus(){
+      const sleeping = !!state.sleepingFrom;
+      $.sleepDot.className = 'dot ' + (sleeping ? 'on':'off');
+      $.sleepState.textContent = sleeping ? 'Сейчас спит' : 'Сейчас не спит';
+      $.kpiCurrent.textContent = sleeping ? fmtDuration(Date.now()-state.sleepingFrom) : '—';
+
+      const last = lastSession();
+      $.kpiLast.textContent = last ? fmtDuration(last.end - last.start) : '—';
+      $.lastSleepBadge.textContent = last ? `Последний сон: ${fmtTime(new Date(last.start))}–${fmtTime(new Date(last.end))}` : 'Последний сон: —';
+
+      $.kpiToday.textContent = fmtDuration(sumTodaySessions());
+
+      $.sinceFeed.textContent = fmtDuration(sinceLast('feed'));
+      $.sinceDiaper.textContent = fmtDuration(sinceLast('diaper'));
+      $.now.textContent = new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+
+      // таймер отображения
+      if(window.__timer) cancelAnimationFrame(window.__timer);
+      function tick(){ renderStatus(); }
+      window.__timer = requestAnimationFrame(()=>{ setTimeout(tick, 1000); });
     }
-    return [...map.entries()].sort((a,b)=> b[0].localeCompare(a[0]));
-  }
 
-  function renderTimeline(){
-    const frag = document.createDocumentFragment();
-    if(state.items.length === 0 && !sleepRunning && !feedSessionRunning){
-      const empty = document.createElement('div');
-      empty.className = 'tiny';
-      empty.style.margin = '6px 4px';
-      empty.textContent = 'Пока пусто. Отметь сон/кормление/подгузник.';
-      frag.appendChild(empty);
-      $timeline.replaceChildren(frag);
-      return;
+    function groupByDay(){
+      // соберём единый поток: сессии сна как start/stop, и события
+      const items = [];
+      for(const s of state.sessions){ items.push({kind:'sleep', start:s.start, end:s.end}); }
+      for(const e of state.events){ items.push({kind:e.type, time:e.time}); }
+      // если идёт текущий сон — тоже показываем (без end)
+      if(state.sleepingFrom){ items.push({kind:'sleep-live', start: state.sleepingFrom}); }
+      items.sort((a,b)=> (b.time??b.end??b.start) - (a.time??a.end??a.start));
+
+      const days = new Map();
+      for(const it of items){
+        const t = it.time ?? it.end ?? it.start;
+        const key = fmtDateKey(new Date(t));
+        if(!days.has(key)) days.set(key, []);
+        days.get(key).push(it);
+      }
+      return days;
     }
-    const entries = groupByDay(state.items);
-    for(const [key, arr] of entries){
-      const day = document.createElement('div'); day.className = 'day';
-      const h = document.createElement('h3'); h.textContent = fmtDateHuman(new Date(key)); day.appendChild(h);
-      // sort day items by newest first
-      arr.sort((a,b)=> ( (b.time??b.end??b.start) - (a.time??a.end??a.start) ));
-      for(const it of arr){
-        const item = document.createElement('div'); item.className='item';
-        const left = document.createElement('div'); left.className='left';
-        const ico = document.createElement('div'); ico.className='ico';
-        const meta = document.createElement('div'); meta.className='meta';
-        const title = document.createElement('div'); title.className='title';
-        const sub = document.createElement('div'); sub.className='sub';
 
-        if(it.type === 'sleep'){
-          ico.textContent = '😴';
-          const s = fmtTime(it.start), e = fmtTime(it.end);
-          title.textContent = `Сон ${s} — ${e}`;
-          sub.textContent = fmtDuration(it.end - it.start);
-        } else if(it.type === 'feed_session'){
-          ico.textContent = '🍽';
-          const s = fmtTime(it.start), e = fmtTime(it.end);
-          title.textContent = `Прогулка ${s} — ${e}`;
-          sub.textContent = fmtDuration(it.end - it.start);
-        } else if(it.type === 'feed'){
-          ico.textContent = '🍼';
-          title.textContent = 'Кормление';
-          sub.textContent = fmtTime(it.time);
-        } else if(it.type === 'diaper'){
-          ico.textContent = '🧷';
-          title.textContent = 'Подгузник';
-          sub.textContent = fmtTime(it.time);
+    function renderTimeline(){
+      const days = groupByDay();
+      const frag = document.createDocumentFragment();
+      const entries = [...days.entries()].sort((a,b)=> b[0].localeCompare(a[0]));
+      if(entries.length===0){
+        const empty = document.createElement('div');
+        empty.className = 'tiny';
+        empty.style.margin = '6px 4px 8px';
+        empty.textContent = 'Пока пусто. Отметьте сон, кормление или подгузник.';
+        frag.appendChild(empty);
+      }
+
+      for(const [key, arr] of entries){
+        const cap = document.createElement('div'); cap.className='tl-day';
+        const h = document.createElement('h3'); h.textContent = fmtDateHuman(new Date(key)); cap.appendChild(h);
+        for(const it of arr){
+          const row = document.createElement('div'); row.className='item';
+          const ico = document.createElement('div'); ico.className='i-ico';
+          const main = document.createElement('div'); main.className='i-main';
+          const right = document.createElement('div'); right.className='i-sub';
+
+          if(it.kind==='sleep' || it.kind==='sleep-live'){
+            ico.textContent = '😴';
+            const start = new Date(it.start);
+            const end = it.end ? new Date(it.end) : new Date();
+            const title = document.createElement('div'); title.className='i-title';
+            title.textContent = it.end ? `Сон ${fmtTime(start)}–${fmtTime(end)}` : `Сон с ${fmtTime(start)} (идёт)`;
+            const sub = document.createElement('div'); sub.className='i-sub';
+            sub.textContent = fmtDuration(end - start);
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = it.end ? new Date(it.end).toLocaleTimeString('ru-RU',{hour:'2-digit', minute:'2-digit'}) : 'сейчас';
+          }
+          else if(it.kind==='feed'){
+            ico.textContent = '🍼';
+            const t = new Date(it.time);
+            const title = document.createElement('div'); title.className='i-title'; title.textContent = 'Кормление';
+            const sub = document.createElement('div'); sub.className='i-sub'; sub.textContent = `${fmtTime(t)}`;
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = t.toLocaleDateString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+          }
+          else if(it.kind==='diaper'){
+            ico.textContent = '🧷';
+            const t = new Date(it.time);
+            const title = document.createElement('div'); title.className='i-title'; title.textContent = 'Подгузник';
+            const sub = document.createElement('div'); sub.className='i-sub'; sub.textContent = `${fmtTime(t)}`;
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = t.toLocaleDateString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+          }
+
+          row.appendChild(ico); row.appendChild(main); row.appendChild(right);
+          cap.appendChild(row);
         }
-
-        meta.appendChild(title);
-        meta.appendChild(sub);
-        left.appendChild(ico);
-        left.appendChild(meta);
-
-        const right = document.createElement('div'); right.className='right';
-        const timeLabel = document.createElement('div'); timeLabel.className='tiny';
-        timeLabel.textContent = (it.end ? fmtTime(it.end) : (it.time ? fmtTime(it.time) : '—'));
-        const trash = document.createElement('button'); trash.className='trash';
-        trash.innerHTML = 'Удалить';
-        trash.addEventListener('click', ()=> deleteItem(it.id));
-
-        right.appendChild(timeLabel);
-        right.appendChild(trash);
-
-        item.appendChild(left);
-        item.appendChild(right);
-        day.appendChild(item);
+        frag.appendChild(cap);
       }
-      frag.appendChild(day);
+
+      $.timeline.replaceChildren(frag);
     }
 
-    // show running sessions as top-most if exist
-    if(sleepRunning){
-      const live = document.createElement('div'); live.className='day';
-      const h = document.createElement('h3'); h.textContent = 'Текущие'; live.appendChild(h);
-      const item = document.createElement('div'); item.className='item';
-      const left = document.createElement('div'); left.className='left';
-      const ico = document.createElement('div'); ico.className='ico'; ico.textContent='😴';
-      const meta = document.createElement('div'); meta.className='meta';
-      const t1 = document.createElement('div'); t1.className='title'; t1.textContent = 'Сон (идёт)';
-      const t2 = document.createElement('div'); t2.className='sub'; t2.textContent = fmtDuration(Date.now() - sleepRunning);
-      meta.appendChild(t1); meta.appendChild(t2);
-      left.appendChild(ico); left.appendChild(meta);
-      const right = document.createElement('div'); right.className='right';
-      const stopBtn = document.createElement('button'); stopBtn.className='trash'; stopBtn.textContent='Стоп и сохранить';
-      stopBtn.addEventListener('click', stopSleep);
-      right.appendChild(stopBtn);
-      item.appendChild(left); item.appendChild(right);
-      live.appendChild(item);
-      frag.insertBefore(live, frag.firstChild);
+    function render(){
+      renderStatus();
+      renderTimeline();
     }
 
-    if(feedSessionRunning){
-      const live = document.createElement('div'); live.className='day';
-      const h = document.createElement('h3'); h.textContent = 'Текущие'; live.appendChild(h);
-      const item = document.createElement('div'); item.className='item';
-      const left = document.createElement('div'); left.className='left';
-      const ico = document.createElement('div'); ico.className='ico'; ico.textContent='🍽';
-      const meta = document.createElement('div'); meta.className='meta';
-      const t1 = document.createElement('div'); t1.className='title'; t1.textContent = 'Прогулка (идёт)';
-      const t2 = document.createElement('div'); t2.className='sub'; t2.textContent = fmtDuration(Date.now() - feedSessionRunning);
-      meta.appendChild(t1); meta.appendChild(t2);
-      left.appendChild(ico); left.appendChild(meta);
-      const right = document.createElement('div'); right.className='right';
-      const stopBtn = document.createElement('button'); stopBtn.className='trash'; stopBtn.textContent='Стоп и сохранить';
-      stopBtn.addEventListener('click', stopFeedSession);
-      right.appendChild(stopBtn);
-      item.appendChild(left); item.appendChild(right);
-      live.appendChild(item);
-      frag.insertBefore(live, frag.firstChild);
+    // простой тоаст
+    function toast(msg){
+      let t = document.getElementById('toast');
+      if(!t){
+        t = document.createElement('div');
+        t.id='toast';
+        Object.assign(t.style, {position:'fixed', left:'50%', bottom:'28px', transform:'translateX(-50%)', padding:'10px 14px', background:'#14161a', color:'var(--text)', border:'1px solid rgba(255,255,255,.14)', borderRadius:'10px', boxShadow:'var(--shadow)', zIndex:9999, opacity:0, transition:'opacity .15s ease'});
+        document.body.appendChild(t);
+      }
+      t.textContent = msg; t.style.opacity = .98; setTimeout(()=> t.style.opacity = 0, 1600);
     }
 
-    $timeline.replaceChildren(frag);
-  }
-
-  // update all UI parts
-  function updateActiveUI(){
-    // indicators
-    $sleepIndicator.textContent = sleepRunning ? 'Сейчас: спит' : 'Сейчас: не спит';
-    $feedSessIndicator.textContent = feedSessionRunning ? 'Сейчас: в прогулки' : 'Сейчас: дома';
-    // KPIs
-    $sleepToday.textContent = fmtDuration(sumTodaySleep());
-    const last = lastSleep();
-    $sleepLast.textContent = last ? fmtDuration(last.end - last.start) : '—';
-    $sleepCurrent.textContent = sleepRunning ? fmtDuration(Date.now() - sleepRunning) : '—';
-
-    $feedSessCount.textContent = countTodayFeedSessions();
-    const lf = lastFeedSession();
-    $feedSessLast.textContent = lf ? fmtDuration(lf.end - lf.start) : '—';
-    $feedSessCurrent.textContent = feedSessionRunning ? fmtDuration(Date.now() - feedSessionRunning) : '—';
-
-    // since last feed/diaper
-    const sFeed = timeSinceLast('feed'); $sinceFeed.textContent = sFeed ? fmtDuration(sFeed) : '—';
-    const sDiaper = timeSinceLast('diaper'); $sinceDiaper.textContent = sDiaper ? fmtDuration(sDiaper) : '—';
-    $nowTime.textContent = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-
-    // update button styles for running sessions
-    $sleepStart.disabled = !!sleepRunning;
-    $sleepStop.disabled = !sleepRunning;
-    $feedSessionStart.disabled = !!feedSessionRunning;
-    $feedSessionStop.disabled = !feedSessionRunning;
-  }
-
-  // toast
-  let toastTimer = null;
-  function toast(msg, ms = 1500){
-    $toast.textContent = msg;
-    $toast.style.opacity = '1';
-    if(toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=> $toast.style.opacity = '0', ms);
-  }
-
-  // render wrapper
-  function render(){
-    renderTimeline();
-    updateActiveUI();
-  }
-
-  // init
-  function init(){
+    // ===== ИНИЦ =====
     load();
     render();
 
-    // attach events
-    $sleepStart.addEventListener('click', startSleep);
-    $sleepStop.addEventListener('click', stopSleep);
-    $feedSessionStart.addEventListener('click', startFeedSession);
-    $feedSessionStop.addEventListener('click', stopFeedSession);
-
-    $markFeed.addEventListener('click', ()=> addInstant('feed'));
-    $markDiaper.addEventListener('click', ()=> addInstant('diaper'));
-
-    $clearAll.addEventListener('click', (e)=>{
+    // обработчики
+    $.btnStart.addEventListener('click', startSleep);
+    $.btnStop.addEventListener('click', stopSleep);
+    $.btnFeed.addEventListener('click', ()=> addEvent('feed'));
+    $.btnDiaper.addEventListener('click', ()=> addEvent('diaper'));
+    $.clearAll.addEventListener('click', (e)=>{
       e.preventDefault();
-      if(!confirm('Удалить все записи?')) return;
-      state.items = [];
-      sleepRunning = null; feedSessionRunning = null;
-      save(); render(); toast('Все данные удалены');
+      if(confirm('Удалить все записи?')){
+        state.sleepingFrom = null; state.sessions = []; state.events = []; save(); render();
+      }
     });
-
-    // tick to update running durations and "since last" every second
-    tickTimer = setInterval(()=> {
-      updateActiveUI();
-      // we update timeline regularly too, but only every 2s to avoid redraw thrash
-      if(Math.random() < 0.5) renderTimeline();
-    }, 1000);
-  }
-
-  // expose stop functions for live items in timeline
-  window.stopSleep = stopSleep;
-  window.stopFeedSession = stopFeedSession;
-
-  init();
-})();
-</script>
+  </script>
 </body>
 </html>

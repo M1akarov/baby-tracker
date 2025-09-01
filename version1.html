@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baby Tracker — сон · еда · подгузник</title>
+  <meta name="theme-color" content="#0b0b0c" />
+  <style>
+    :root{
+      --bg:#0b0b0c;          /* тёмный фон, современно */
+      --card:#121214;        /* карточки */
+      --muted:#8b8d93;       /* вторичный текст */
+      --text:#f4f6f8;        /* основной текст */
+      --brand:#2aa9ff;       /* акцент */
+      --brand-2:#7ae27a;     /* акцент 2 */
+      --danger:#ff5c5c;      /* опасные действия */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text); background:radial-gradient(1000px 600px at 80% -10%, #0d1a22, transparent), var(--bg);
+      letter-spacing:.2px;
+    }
+    .wrap{max-width:980px; margin:0 auto; padding:28px 16px 60px}
+    header{display:flex; gap:14px; align-items:center; justify-content:space-between; margin-bottom:18px}
+    .app-title{font-size:20px; font-weight:700; letter-spacing:.3px}
+    .sub{color:var(--muted); font-size:13px}
+
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    @media (max-width:880px){ .grid{grid-template-columns:1fr} }
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+    .card h2{font-size:15px; font-weight:700; margin:0 0 10px}
+
+    .status{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border-radius:14px; background:#0f0f12; border:1px solid rgba(255,255,255,.05)}
+    .status .dot{width:10px; height:10px; border-radius:50%; margin-right:8px}
+    .status .on{background:var(--brand-2); box-shadow:0 0 0 3px rgba(122,226,122,.15)}
+    .status .off{background:#555; box-shadow:0 0 0 3px rgba(255,255,255,.08)}
+
+    .btns{display:flex; flex-wrap:wrap; gap:10px}
+    button{
+      appearance:none; border:0; cursor:pointer; padding:14px 16px; border-radius:14px;
+      background:#15161a; color:var(--text); font-weight:650; letter-spacing:.2px; transition:transform .06s ease, filter .2s ease, background .2s ease;
+      border:1px solid rgba(255,255,255,.06); box-shadow: 0 6px 14px rgba(0,0,0,.35);
+    }
+    button:hover{filter:brightness(1.08)}
+    button:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(180deg, #1a1f24, #13161a); border-color: rgba(42,169,255,.35)}
+    .btn-accent{background:linear-gradient(180deg, #162016, #101610); border-color: rgba(122,226,122,.4)}
+    .btn-danger{background:linear-gradient(180deg, #241616, #1a1111); border-color: rgba(255,92,92,.35)}
+
+    .kpi{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:12px}
+    .kpi .box{padding:14px; background:#0f1013; border-radius:12px; border:1px solid rgba(255,255,255,.06)}
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .val{font-size:20px; font-weight:700; margin-top:4px}
+
+    .timeline{margin-top:10px}
+    .tl-day{margin-top:8px}
+    .tl-day h3{font-size:13px; color:var(--muted); font-weight:700; letter-spacing:.4px; text-transform:uppercase; margin:16px 4px 6px}
+    .item{display:flex; align-items:center; gap:12px; padding:12px; background:#0f1013; border:1px solid rgba(255,255,255,.06); border-radius:12px; margin:6px 0}
+    .i-ico{font-size:18px; width:28px; text-align:center}
+    .i-main{flex:1}
+    .i-title{font-weight:650}
+    .i-sub{color:var(--muted); font-size:13px}
+
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .row.stretch{justify-content:space-between}
+
+    .tiny{font-size:12px; color:var(--muted)}
+    .ghost{opacity:.85}
+
+    .footer{margin-top:16px; display:flex; justify-content:space-between; align-items:center}
+    .link{color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25)}
+
+    /* Toggle-like buttons */
+    .btn-start{background:linear-gradient(180deg, #112232, #0c1720); border-color: rgba(42,169,255,.45)}
+    .btn-stop{background:linear-gradient(180deg, #2b1212, #180d0d); border-color: rgba(255,92,92,.45)}
+    .btn-feed{background:linear-gradient(180deg, #142023, #0f1618); border-color:rgba(42,169,255,.35)}
+    .btn-diaper{background:linear-gradient(180deg, #121f14, #0d160e); border-color:rgba(122,226,122,.35)}
+
+    .badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.12); background:#101114}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="app-title">Baby Tracker</div>
+        <div class="sub">Сон · Еда · Подгузник — минимализм, скорость, чёткие действия</div>
+      </div>
+      <div class="tiny">Данные хранятся локально (LocalStorage)</div>
+    </header>
+
+    <div class="grid">
+      <!-- Левая колонка: управление сном -->
+      <section class="card" aria-labelledby="sleep-title">
+        <h2 id="sleep-title">Сон</h2>
+
+        <div class="status" id="sleepStatus">
+          <div class="row">
+            <div class="dot off" id="sleepDot"></div>
+            <div>
+              <div class="i-title" id="sleepState">Сейчас не спит</div>
+              <div class="i-sub" id="sleepTimer">—</div>
+            </div>
+          </div>
+          <div class="badge" id="lastSleepBadge">Последний сон: —</div>
+        </div>
+
+        <div class="btns" style="margin-top:12px">
+          <button class="btn-start" id="btnStart">Старт сна</button>
+          <button class="btn-stop" id="btnStop">Стоп сна</button>
+        </div>
+
+        <div class="kpi">
+          <div class="box"><div class="label">Сегодня спал(а)</div><div class="val" id="kpiToday">0:00</div></div>
+          <div class="box"><div class="label">Последняя сессия</div><div class="val" id="kpiLast">—</div></div>
+          <div class="box"><div class="label">Текущая сессия</div><div class="val" id="kpiCurrent">—</div></div>
+        </div>
+      </section>
+
+      <!-- Правая колонка: быстрые события -->
+      <section class="card" aria-labelledby="quick-title">
+        <h2 id="quick-title">Быстрые отметки</h2>
+        <div class="btns">
+          <button class="btn-feed" id="btnFeed">+ Еда</button>
+          <button class="btn-diaper" id="btnDiaper">+ Подгузник</button>
+        </div>
+
+        <div class="kpi">
+          <div class="box"><div class="label">С последнего кормления</div><div class="val" id="sinceFeed">—</div></div>
+          <div class="box"><div class="label">С последней смены</div><div class="val" id="sinceDiaper">—</div></div>
+          <div class="box"><div class="label">Сейчас</div><div class="val" id="now">—</div></div>
+        </div>
+
+        <div class="footer">
+          <a class="link" href="#" id="clearAll">Сбросить все данные</a>
+          <span class="tiny ghost">v1.0 · оффлайн</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- Лента событий -->
+    <section class="card timeline" aria-labelledby="tl-title">
+      <h2 id="tl-title">Лента</h2>
+      <div id="timeline"></div>
+    </section>
+  </div>
+
+  <script>
+    // ===== УТИЛИТЫ ВРЕМЕНИ =====
+    const pad = n => String(n).padStart(2,'0');
+    const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const fmtDateKey = d => d.toISOString().slice(0,10);
+    function fmtDateHuman(d){
+      const todayKey = fmtDateKey(new Date());
+      const key = fmtDateKey(d);
+      if(key===todayKey) return 'Сегодня';
+      const y = new Date(); y.setDate(y.getDate()-1);
+      if(key===fmtDateKey(y)) return 'Вчера';
+      return d.toLocaleDateString('ru-RU', {weekday:'long', day:'2-digit', month:'long'});
+    }
+    function fmtDuration(ms){
+      if(ms == null || isNaN(ms)) return '—';
+      const s = Math.max(0, Math.floor(ms/1000));
+      const h = Math.floor(s/3600);
+      const m = Math.floor((s%3600)/60);
+      const sec = s%60;
+      return h>0 ? `${h}:${pad(m)}` : `${m}:${pad(sec)}`;
+    }
+
+    // ===== ХРАНИЛИЩЕ =====
+    const KEY = 'babyLogV1';
+    const state = {
+      sleepingFrom: null,        // timestamp | null
+      sessions: [],              // {start:number, end:number}
+      events: []                 // {type:'feed'|'diaper', time:number}
+    };
+    function load(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(raw){ Object.assign(state, JSON.parse(raw)); }
+      }catch(e){ console.warn('Load error', e) }
+    }
+    function save(){
+      try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+      catch(e){ console.warn('Save error', e) }
+    }
+
+    // ===== ЛОГИКА СНА =====
+    function startSleep(){
+      if(state.sleepingFrom){ toast('Сон уже идёт'); return; }
+      state.sleepingFrom = Date.now();
+      save();
+      render();
+    }
+    function stopSleep(){
+      if(!state.sleepingFrom){ toast('Сон не запущен'); return; }
+      const now = Date.now();
+      const start = state.sleepingFrom;
+      if(now - start < 30*1000){ // анти-ошибка: <30 сек не пишем
+        state.sleepingFrom = null; save(); render();
+        toast('Короткая сессия не сохранена (<30с)');
+        return;
+      }
+      state.sessions.unshift({start, end: now});
+      state.sleepingFrom = null;
+      save();
+      render();
+    }
+
+    // ===== СОБЫТИЯ =====
+    function addEvent(type){
+      const time = Date.now();
+      state.events.unshift({type, time});
+      save();
+      render();
+    }
+
+    // ===== UI =====
+    const el = sel => document.querySelector(sel);
+    const $ = {
+      sleepDot: el('#sleepDot'),
+      sleepState: el('#sleepState'),
+      sleepTimer: el('#sleepTimer'),
+      lastSleepBadge: el('#lastSleepBadge'),
+      kpiToday: el('#kpiToday'),
+      kpiLast: el('#kpiLast'),
+      kpiCurrent: el('#kpiCurrent'),
+      sinceFeed: el('#sinceFeed'),
+      sinceDiaper: el('#sinceDiaper'),
+      now: el('#now'),
+      timeline: el('#timeline'),
+      btnStart: el('#btnStart'),
+      btnStop: el('#btnStop'),
+      btnFeed: el('#btnFeed'),
+      btnDiaper: el('#btnDiaper'),
+      clearAll: el('#clearAll'),
+    };
+
+    function sumTodaySessions(){
+      const todayKey = fmtDateKey(new Date());
+      let total = 0;
+      for(const s of state.sessions){
+        const d = new Date(s.start);
+        if(fmtDateKey(d) === todayKey){ total += (s.end - s.start); }
+      }
+      // если сейчас идёт сон — добавить текущий прогресс
+      if(state.sleepingFrom){
+        const d = new Date(state.sleepingFrom);
+        if(fmtDateKey(d) === todayKey){ total += (Date.now() - state.sleepingFrom); }
+      }
+      return total;
+    }
+
+    function lastSession(){ return state.sessions[0] || null; }
+
+    function sinceLast(type){
+      const list = type === 'sleep'
+        ? [{time: state.sleepingFrom || lastSession()?.end || null}]
+        : state.events.filter(e=>e.type===type);
+      const t = list && list[0] ? list[0].time : null;
+      return t ? Date.now() - t : null;
+    }
+
+    function renderStatus(){
+      const sleeping = !!state.sleepingFrom;
+      $.sleepDot.className = 'dot ' + (sleeping ? 'on':'off');
+      $.sleepState.textContent = sleeping ? 'Сейчас спит' : 'Сейчас не спит';
+      $.kpiCurrent.textContent = sleeping ? fmtDuration(Date.now()-state.sleepingFrom) : '—';
+
+      const last = lastSession();
+      $.kpiLast.textContent = last ? fmtDuration(last.end - last.start) : '—';
+      $.lastSleepBadge.textContent = last ? `Последний сон: ${fmtTime(new Date(last.start))}–${fmtTime(new Date(last.end))}` : 'Последний сон: —';
+
+      $.kpiToday.textContent = fmtDuration(sumTodaySessions());
+
+      $.sinceFeed.textContent = fmtDuration(sinceLast('feed'));
+      $.sinceDiaper.textContent = fmtDuration(sinceLast('diaper'));
+      $.now.textContent = new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+
+      // таймер отображения
+      if(window.__timer) cancelAnimationFrame(window.__timer);
+      function tick(){ renderStatus(); }
+      window.__timer = requestAnimationFrame(()=>{ setTimeout(tick, 1000); });
+    }
+
+    function groupByDay(){
+      // соберём единый поток: сессии сна как start/stop, и события
+      const items = [];
+      for(const s of state.sessions){ items.push({kind:'sleep', start:s.start, end:s.end}); }
+      for(const e of state.events){ items.push({kind:e.type, time:e.time}); }
+      // если идёт текущий сон — тоже показываем (без end)
+      if(state.sleepingFrom){ items.push({kind:'sleep-live', start: state.sleepingFrom}); }
+      items.sort((a,b)=> (b.time??b.end??b.start) - (a.time??a.end??a.start));
+
+      const days = new Map();
+      for(const it of items){
+        const t = it.time ?? it.end ?? it.start;
+        const key = fmtDateKey(new Date(t));
+        if(!days.has(key)) days.set(key, []);
+        days.get(key).push(it);
+      }
+      return days;
+    }
+
+    function renderTimeline(){
+      const days = groupByDay();
+      const frag = document.createDocumentFragment();
+      const entries = [...days.entries()].sort((a,b)=> b[0].localeCompare(a[0]));
+      if(entries.length===0){
+        const empty = document.createElement('div');
+        empty.className = 'tiny';
+        empty.style.margin = '6px 4px 8px';
+        empty.textContent = 'Пока пусто. Отметьте сон, кормление или подгузник.';
+        frag.appendChild(empty);
+      }
+
+      for(const [key, arr] of entries){
+        const cap = document.createElement('div'); cap.className='tl-day';
+        const h = document.createElement('h3'); h.textContent = fmtDateHuman(new Date(key)); cap.appendChild(h);
+        for(const it of arr){
+          const row = document.createElement('div'); row.className='item';
+          const ico = document.createElement('div'); ico.className='i-ico';
+          const main = document.createElement('div'); main.className='i-main';
+          const right = document.createElement('div'); right.className='i-sub';
+
+          if(it.kind==='sleep' || it.kind==='sleep-live'){
+            ico.textContent = '😴';
+            const start = new Date(it.start);
+            const end = it.end ? new Date(it.end) : new Date();
+            const title = document.createElement('div'); title.className='i-title';
+            title.textContent = it.end ? `Сон ${fmtTime(start)}–${fmtTime(end)}` : `Сон с ${fmtTime(start)} (идёт)`;
+            const sub = document.createElement('div'); sub.className='i-sub';
+            sub.textContent = fmtDuration(end - start);
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = it.end ? new Date(it.end).toLocaleTimeString('ru-RU',{hour:'2-digit', minute:'2-digit'}) : 'сейчас';
+          }
+          else if(it.kind==='feed'){
+            ico.textContent = '🍼';
+            const t = new Date(it.time);
+            const title = document.createElement('div'); title.className='i-title'; title.textContent = 'Кормление';
+            const sub = document.createElement('div'); sub.className='i-sub'; sub.textContent = `${fmtTime(t)}`;
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = t.toLocaleDateString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+          }
+          else if(it.kind==='diaper'){
+            ico.textContent = '🧷';
+            const t = new Date(it.time);
+            const title = document.createElement('div'); title.className='i-title'; title.textContent = 'Подгузник';
+            const sub = document.createElement('div'); sub.className='i-sub'; sub.textContent = `${fmtTime(t)}`;
+            main.appendChild(title); main.appendChild(sub);
+            right.textContent = t.toLocaleDateString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+          }
+
+          row.appendChild(ico); row.appendChild(main); row.appendChild(right);
+          cap.appendChild(row);
+        }
+        frag.appendChild(cap);
+      }
+
+      $.timeline.replaceChildren(frag);
+    }
+
+    function render(){
+      renderStatus();
+      renderTimeline();
+    }
+
+    // простой тоаст
+    function toast(msg){
+      let t = document.getElementById('toast');
+      if(!t){
+        t = document.createElement('div');
+        t.id='toast';
+        Object.assign(t.style, {position:'fixed', left:'50%', bottom:'28px', transform:'translateX(-50%)', padding:'10px 14px', background:'#14161a', color:'var(--text)', border:'1px solid rgba(255,255,255,.14)', borderRadius:'10px', boxShadow:'var(--shadow)', zIndex:9999, opacity:0, transition:'opacity .15s ease'});
+        document.body.appendChild(t);
+      }
+      t.textContent = msg; t.style.opacity = .98; setTimeout(()=> t.style.opacity = 0, 1600);
+    }
+
+    // ===== ИНИЦ =====
+    load();
+    render();
+
+    // обработчики
+    $.btnStart.addEventListener('click', startSleep);
+    $.btnStop.addEventListener('click', stopSleep);
+    $.btnFeed.addEventListener('click', ()=> addEvent('feed'));
+    $.btnDiaper.addEventListener('click', ()=> addEvent('diaper'));
+    $.clearAll.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(confirm('Удалить все записи?')){
+        state.sleepingFrom = null; state.sessions = []; state.events = []; save(); render();
+      }
+    });
+  </script>
+</body>
+</html>

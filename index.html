@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Baby Tracker — сон · еда · подгузник</title>
+<title>Baby Tracker</title>
 <style>
   :root{
     --bg:#f5f6f7;
@@ -73,9 +73,9 @@
     <header>
       <div>
         <h1>Baby Tracker</h1>
-        <div class="sub">Сон · Прогулка · Подгузник</div>
+        <!-- <div class="sub">Сон · Прогулка · Подгузник</div> -->
       </div>
-      <div class="tiny">Данные в смартфоне*</div>
+      <!-- <div class="tiny">Данные в смартфоне*</div> -->
     </header>
 
     <div class="grid">
@@ -84,8 +84,8 @@
         <h2 id="sleep-title" class="section-title">Сон</h2>
 
         <div class="controls">
-          <button id="sleepStart" class="btn-primary">▶ Старт сна</button>
-          <button id="sleepStop" class="btn-ghost">■ Стоп сна</button>
+          <button id="sleepStart" class="btn-primary">Старт сна</button>
+          <button id="sleepStop" class="btn-ghost">Стоп сна</button>
           <div style="flex:1"></div>
           <div id="sleepIndicator" class="badge">Сейчас: не спит</div>
         </div>
@@ -100,10 +100,10 @@
 
         <hr style="margin:14px 0;border:none;border-top:1px solid rgba(0,0,0,0.04)">
 
-        <h3 class="section-title">Сессия прогулки (Start / Stop)</h3>
+        <h3 class="section-title">Прогулка</h3>
         <div class="controls">
-          <button id="feedSessionStart" class="btn-primary">▶ Старт прогулки</button>
-          <button id="feedSessionStop" class="btn-ghost">■ Стоп прогулки</button>
+          <button id="feedSessionStart" class="btn-primary">Старт</button>
+          <button id="feedSessionStop" class="btn-ghost">Финиш</button>
           <div style="flex:1"></div>
           <div id="feedSessionIndicator" class="badge">Сейчас: не в прогулки</div>
         </div>
@@ -117,10 +117,10 @@
 
       <!-- Right column: quick events -->
       <section class="card" aria-labelledby="quick-title">
-        <h2 id="quick-title" class="section-title">Быстрые отметки</h2>
+        <h2 id="quick-title" class="section-title">Важные отметки</h2>
         <div class="controls" style="margin-bottom:12px">
-          <button id="markFeed" class="btn-primary">🍼 Пометить кормление</button>
-          <button id="markDiaper" class="btn-green">🧷 Пометить подгузник</button>
+          <button id="markFeed" class="btn-primary">🍼 Кормление + </button>
+          <button id="markDiaper" class="btn-green">👶🏻 Подгузник + </button>
           <button id="clearAll" class="btn-danger">Очистить всё</button>
         </div>
 
